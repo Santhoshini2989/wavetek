@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function Hero() {
     return (
-        <section className="relative px-4 md:px-8 mt-40 mb-12">
+        <section className="relative px-4 md:px-8 mt-60 mb-12">
             <div className="max-w-[1400px] mx-auto bg-gradient-to-b from-white to-[#F0F2FF] rounded-[3rem] p-12 md:p-24 relative overflow-hidden shadow-2xl shadow-indigo-100/50 border border-white/60">
 
                 {/* Background Video */}
@@ -33,9 +33,7 @@ export default function Hero() {
                 <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
 
                     <div className="space-y-4">
-                        <span className="inline-block py-1 px-3 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-semibold tracking-wide uppercase">
-                            Welcome to Solana's Encrypted Liquidity Layer
-                        </span>
+
 
                         <h1 className="text-6xl md:text-8xl font-bold text-slate-900 tracking-tight leading-[1] drop-shadow-sm">
                             Your Private <br />

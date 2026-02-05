@@ -148,7 +148,7 @@ export default function Footer() {
             {/* Bottom Bar - Outside Card */}
             <div className="max-w-6xl mx-auto mt-8 flex flex-col md:flex-row justify-between items-center gap-4 px-4">
                 <p className="text-sm text-slate-600">
-                    © 2025 WaveTek
+                    © 2026 WaveTek
                 </p>
                 <div className="flex gap-6">
                     <a href="#" className="text-sm text-slate-600 hover:text-slate-800 transition-colors">

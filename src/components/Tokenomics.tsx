@@ -1,43 +1,85 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useLayoutEffect } from 'react';
 import { Waves, Gem } from 'lucide-react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Tokenomics() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [mouseX, setMouseX] = useState(0.5); // 0 = left, 1 = right, 0.5 = center
+    const waveColRef = useRef<HTMLDivElement>(null);
+    const wealthColRef = useRef<HTMLDivElement>(null);
+    const waveCoinRef = useRef<HTMLDivElement>(null);
+    const wealthCoinRef = useRef<HTMLDivElement>(null);
+    const waveGlowRef = useRef<HTMLDivElement>(null);
+    const wealthGlowRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!containerRef.current) return;
-            const rect = containerRef.current.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            setMouseX(Math.max(0, Math.min(1, x)));
-        };
+    useLayoutEffect(() => {
+        const ctx = gsap.context(() => {
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: 'top top',
+                    end: '+=3500', // Increased scroll distance for longer transition
+                    pin: true,
+                    scrub: 1,
+                    // markers: true, // Uncomment for debugging
+                }
+            });
 
-        const container = containerRef.current;
-        if (container) {
-            container.addEventListener('mousemove', handleMouseMove);
-            return () => container.removeEventListener('mousemove', handleMouseMove);
-        }
+            // Initial State: WAVE Active, WEALTH Inactive
+            // We set this immediately or let CSS handle it, but GSAP ensures consistency
+
+            // Animation: Transition focus from WAVE to WEALTH
+            tl
+                // 1. Dim WAVE Column
+                .to(waveColRef.current, {
+                    opacity: 0.3,
+                    x: -20,
+                    duration: 1,
+                    ease: 'power1.inOut',
+                }, 0)
+                // 2. Highlight WEALTH Column
+                .to(wealthColRef.current, {
+                    opacity: 1,
+                    x: -10, // Slight movement for dynamic feel
+                    duration: 1,
+                    ease: 'power1.inOut',
+                }, 0)
+
+                // 3. Swap Coin Focus
+                // Shrink/Blur WAVE Coin
+                .to(waveCoinRef.current, {
+                    scale: 0.85,
+                    filter: 'blur(4px)',
+                    zIndex: 10,
+                    x: -60, // Move slightly further away
+                    duration: 1,
+                    ease: 'power1.inOut',
+                }, 0)
+                // Grow/Sharpen WEALTH Coin
+                .to(wealthCoinRef.current, {
+                    scale: 1.15,
+                    filter: 'blur(0px)',
+                    zIndex: 20,
+                    x: 20, // Move to center prominence
+                    duration: 1,
+                    ease: 'power1.inOut',
+                }, 0)
+
+                // 4. Shift Glows
+                .to(waveGlowRef.current, { opacity: 0.2, duration: 1 }, 0)
+                .to(wealthGlowRef.current, { opacity: 0.8, duration: 1 }, 0);
+
+        }, containerRef);
+
+        return () => ctx.revert();
     }, []);
-
-    // Calculate scales based on mouse position
-    // Left side (WAVE): scales up when mouseX < 0.5
-    // Right side (WEALTH): scales up when mouseX > 0.5
-    const waveActive = mouseX < 0.4;
-    const wealthActive = mouseX > 0.6;
-    const neutral = !waveActive && !wealthActive;
-
-    const waveScale = waveActive ? 1.15 : wealthActive ? 0.85 : 1;
-    const wealthScale = wealthActive ? 1.15 : waveActive ? 0.85 : 1;
-    const waveBlur = wealthActive ? 'blur-sm' : '';
-    const wealthBlur = waveActive ? 'blur-sm' : '';
-    const waveZ = waveActive ? 'z-20' : 'z-10';
-    const wealthZ = wealthActive ? 'z-20' : 'z-10';
 
     return (
         <section
             ref={containerRef}
-            className="relative w-full min-h-screen bg-[#F5F5F7] overflow-hidden"
+            className="relative w-full h-screen bg-[#F5F5F7] overflow-hidden flex items-center"
             id="tokenomics"
         >
             {/* Split Background Gradients */}
@@ -59,11 +101,10 @@ export default function Tokenomics() {
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 min-h-screen flex flex-col justify-center">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
 
                 {/* Section Header */}
                 <div className="text-center mb-16">
-
                     <h2 className="text-4xl md:text-6xl font-bold text-slate-900 mb-4">
                         Two Tokens.{' '}
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-yellow-500">
@@ -71,7 +112,7 @@ export default function Tokenomics() {
                         </span>
                     </h2>
                     <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-                        A simple, aligned system for participation and rewards.
+                        Scroll to explore the duality of WaveTek.
                     </p>
                 </div>
 
@@ -80,11 +121,10 @@ export default function Tokenomics() {
 
                     {/* LEFT COLUMN: $WAVE Info */}
                     <div
-                        className="text-center lg:text-left transition-all duration-500"
-                        style={{
-                            opacity: wealthActive ? 0.4 : 1,
-                            transform: waveActive ? 'translateX(-10px)' : 'translateX(0)',
-                        }}
+                        ref={waveColRef}
+                        className="text-center lg:text-left"
+                        // Start fully visible
+                        style={{ opacity: 1, transform: 'translateX(0)' }}
                     >
                         <h3 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">
                             $WAVE
@@ -112,13 +152,15 @@ export default function Tokenomics() {
                     </div>
 
                     {/* CENTER: 3D Coins */}
-                    <div className="relative h-[400px] flex items-center justify-center">
+                    <div className="relative h-[400px] flex items-center justify-center perspective-1000">
 
-                        {/* WAVE Coin (Silver/Blue) */}
+                        {/* WAVE Coin (Silver/Blue) - Starts Highlighted */}
                         <div
-                            className={`absolute transition-all duration-500 ease-out ${waveZ} ${waveBlur}`}
+                            ref={waveCoinRef}
+                            className="absolute z-20"
                             style={{
-                                transform: `translateX(-40px) scale(${waveScale})`,
+                                transform: 'translateX(-40px) scale(1.15)',
+                                filter: 'blur(0px)',
                             }}
                         >
                             <div
@@ -134,20 +176,20 @@ export default function Tokenomics() {
                             </div>
                         </div>
 
-                        {/* WEALTH Coin (Gold) */}
+                        {/* WEALTH Coin (Gold) - Starts Dimmed */}
                         <div
-                            className={`absolute transition-all duration-500 ease-out ${wealthZ} ${wealthBlur}`}
+                            ref={wealthCoinRef}
+                            className="absolute z-10"
                             style={{
-                                transform: `translateX(40px) scale(${wealthScale})`,
-                                animationDelay: '1s',
+                                transform: 'translateX(40px) scale(0.85)',
+                                filter: 'blur(4px)',
                             }}
                         >
                             <div
-                                className="w-48 h-48 md:w-64 md:h-64 rounded-full animate-float"
+                                className="w-48 h-48 md:w-64 md:h-64 rounded-full animate-float-delayed"
                                 style={{
                                     background: 'linear-gradient(135deg, #fef3c7 0%, #f59e0b 30%, #d97706 60%, #fbbf24 100%)',
                                     boxShadow: '0 20px 60px rgba(234, 179, 8, 0.4), inset 0 2px 20px rgba(255,255,255,0.6)',
-                                    animationDelay: '1s',
                                 }}
                             >
                                 <div className="w-full h-full rounded-full flex items-center justify-center">
@@ -158,28 +200,29 @@ export default function Tokenomics() {
 
                         {/* Glow Effects */}
                         <div
-                            className="absolute w-64 h-64 bg-cyan-400/20 rounded-full blur-3xl transition-opacity duration-500"
+                            ref={waveGlowRef}
+                            className="absolute w-64 h-64 bg-cyan-400/20 rounded-full blur-3xl"
                             style={{
                                 left: '10%',
-                                opacity: waveActive ? 0.8 : 0.3,
+                                opacity: 0.8,
                             }}
                         />
                         <div
-                            className="absolute w-64 h-64 bg-yellow-400/20 rounded-full blur-3xl transition-opacity duration-500"
+                            ref={wealthGlowRef}
+                            className="absolute w-64 h-64 bg-yellow-400/20 rounded-full blur-3xl"
                             style={{
                                 right: '10%',
-                                opacity: wealthActive ? 0.8 : 0.3,
+                                opacity: 0.2, // Starts low
                             }}
                         />
                     </div>
 
                     {/* RIGHT COLUMN: $WEALTH Info */}
                     <div
-                        className="text-center lg:text-right transition-all duration-500"
-                        style={{
-                            opacity: waveActive ? 0.4 : 1,
-                            transform: wealthActive ? 'translateX(10px)' : 'translateX(0)',
-                        }}
+                        ref={wealthColRef}
+                        className="text-center lg:text-right"
+                        // Starts dimmed
+                        style={{ opacity: 0.3, transform: 'translateX(20px)' }}
                     >
                         <h3 className="text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500 mb-4">
                             $WEALTH
@@ -205,13 +248,6 @@ export default function Tokenomics() {
                             Buy WEALTH
                         </button>
                     </div>
-                </div>
-
-                {/* Bottom Caption */}
-                <div className="text-center mt-16">
-                    <p className="text-sm text-slate-400">
-                        Move your mouse left or right to explore each token
-                    </p>
                 </div>
             </div>
         </section>

@@ -31,7 +31,7 @@ const phases: RoadmapPhase[] = [
         quarter: 'Q1 2026',
         items: ['Integrate Umbra SDK', 'WaveStake Mainnet', 'Privacy Hackathon'],
         position: 'right',
-        top: 700,
+        top: 1200,
     },
     {
         id: 'phase3',
@@ -40,7 +40,7 @@ const phases: RoadmapPhase[] = [
         quarter: 'Q2 2026',
         items: ['RWA + Gold Staking', 'Solana Mobile dApp Store', 'Warrior PFP Collection'],
         position: 'left',
-        top: 1300,
+        top: 2200,
     },
 ];
 
@@ -161,7 +161,7 @@ export default function Roadmap() {
             </div>
 
             {/* Cards Container */}
-            <div className="relative max-w-6xl mx-auto px-6" style={{ minHeight: '1800px' }}>
+            <div className="relative max-w-6xl mx-auto px-6" style={{ minHeight: '2800px' }}>
 
                 {/* Phase Cards */}
                 {phases.map((phase, index) => {
